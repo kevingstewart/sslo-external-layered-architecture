@@ -1,4 +1,4 @@
-# F5 SSL Orchestrator External Layered Architecture
+# F5 SSL Orchestrator External Layered Architecture (DRAFT)
 A configuration scheme and toolset to deploy SSL Orchestrator in an external layered (load balanced) architecture.
 
 ### Version support
