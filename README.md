@@ -101,6 +101,8 @@ service:
 ### Layer 3 security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
+The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the layer 3 node in the SSLO config is the SSLO-side "entry-self" address on the L4 LB.
+
 *Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.*
 
 **Details**:
@@ -212,14 +214,111 @@ service:
 
 
 ### Layer 2 security service YAML definition
+Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
+
+To support layer 2 security devices, they must be defined as inline layer 3 services in SSL Orchestrator. The SSLO instances use normal layer 3 routing to the L4 LB listener, and the L4 handles the layer 2 communications on its respective SVC-side.
+
+The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the layer 3 node in the SSLO config is the SSLO-side "entry-self" address on the L4 LB.
+
+*Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.*
+
+**Details**:
+| field                      | required | Description                                                                                           |
+|----------------------------|----------|-------------------------------------------------------------------------------------------------------|
+| name                       | yes      | value: arbitrary string - provide a name for this document                                            |
+| desc                       | no       | value: arbitrary string                                                                               |
+| host                       | yes      | value: Host, IP, localhost                                                                            |
+| user                       | yes      | value: admin username                                                                                 |
+| password                   | yes      | value: admin password                                                                                 |
+| service                    | yes      | value: none - service start block                                                                     |
+|   type                     | yes      | value: layer2                                                                                         |
+|   name                     | yes      | value: the name of this service instance                                                              |
+|   state                    | yes      | value: 'present' or 'absent' - allows you define create/update state, or deletion                     |
+|                            |          |                                                                                                       |
+|     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP for this interface                                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP for this interface                                                                 |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
+|       - name               | yes      | value: the name of this layer 2 device instance (must be unique.                                      |
+|         entry-interface    | yes      | value: the physical interfaces for traffic to the security device.                                    |
+|         return-interface   | yes      | value: the physical interfaces for traffic coming from the security device.                           |
+
+*Note that the tool uses an algorithm to select and define the required VLANs, self-IPs and route domains needed to communicate with each layer 2 device on the SVC-side. You need only define each device by its incoming and outgoing interfaces.*
+
+**Standalone example**:
+
+```
+name: layer2b service
+desc: Layer 2 service (b)
+host: localhost
+user: admin
+password: admin
+service:
+  type: layer2
+  name: layer2b
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.9.64.40/25 
+    entry-float: 198.9.64.50/25
+    entry-tag: 400
+    return-interface: 1.2
+    return-self: 198.9.64.140/25
+    return-tag: 401
+  
+  svc-side-net:
+    - name: FEYE1
+      entry-interface: 1.4
+      return-interface: 1.5
+    - name: FEYE2
+      entry-interface: 1.6
+      return-interface: 1.7
+```
+
+**HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+
+*Also note that the SSLO-side return interface does not require a floating self-IP*
+
+```
+name: layer2b service
+desc: Layer 2 service (b)
+host: localhost
+user: admin
+password: admin
+service:
+  type: layer2
+  name: layer2b
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.9.64.50/25 
+    entry-tag: 400
+    return-interface: 1.2
+    return-self: 198.9.64.140/25
+    return-tag: 401
+  
+  svc-side-net:
+    - name: FEYE1
+      entry-interface: 1.4
+      return-interface: 1.5
+    - name: FEYE1
+      entry-interface: 1.6
+      return-interface: 1.7
+```
+
+### HTTP transparent security service YAML definition
 The 
 
 
 ### HTTP explicit security service YAML definition
-The 
-
-
-### HTTP transparent security service YAML definition
 The 
 
 
