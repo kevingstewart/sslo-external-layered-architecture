@@ -14,7 +14,7 @@
 #### Instructions: execute the command with a "--file" option followed by the name of a service configuration YAML file
 ####    ex. python sslo-tier-tool.py --file icapservice1.yml
 ####
-####    Please refer to () for detailed information on the use of this tool and service configuration YAML syntax.
+####    Please refer to (https://github.com/kevingstewart/sslo-external-layered-architecture) for detailed information on the use of this tool and service configuration YAML syntax.
 
 
 ## Imports
