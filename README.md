@@ -32,13 +32,13 @@ The Python application can either run on your local system (targeting remote BIG
 The tool will validate the YAML configuration and then push the required settings to the L4 BIG-IP. This tool supports standalone and HA L4 configurations, generally by including separate IPs, interfaces, tags, and floating IPs for each appliance. Also note that updates are disruptive. To facilitate quick and complete updates to network objects, any existing objects for this service are first removed and then rebuilt. This will cause a momentary lapse in traffic flow to this service. It is therefore recommended that the service be taken out of active SSL Orchestrator service chains before performing any management actions.
 
 The following is the detailed YAML configuration syntax for service mapping and each supported security device type:
-- [link](#service-mapping)Service mapping
-- [link](#service-layer-3)Layer 3 security service
-- [link](#service-layer-2)Layer 2 security service
-- [link](#service-http-transparent)HTTP explicit security service
-- [link](#service-http-explicit)HTTP transparent security service
-- [link](#service-icap)ICAP security service
-- [link](#monitoring)Monitoring
+- [Service mapping](#service-mapping)
+- [Layer 3 security service](#service-layer-3)
+- [Layer 2 security service](#service-layer-2)
+- [HTTP explicit security service](#service-http-transparent)
+- [HTTP transparent security service](#service-http-explicit)
+- [ICAP security service](#service-icap)
+- [Monitoring](#monitoring)
 
 |
 
