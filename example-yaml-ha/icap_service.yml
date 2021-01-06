@@ -1,0 +1,28 @@
+name: icap service
+desc: icap service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: icap
+  name: icap1
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.10.96.38/25
+    entry-ip: 198.10.96.40
+    entry-tag: 520
+  
+  svc-side-net:
+    entry-interface: 1.2
+    entry-self: 10.1.30.125/24
+    entry-snat:
+      - 10.1.30.10
+      - 10.1.30.11
+      - 10.1.30.12
+      - 10.1.30.13
+  
+  svc-members:
+    - 10.1.30.50
+    - 10.1.30.51
