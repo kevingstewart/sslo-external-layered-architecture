@@ -61,7 +61,7 @@ In order to return traffic to the correct SSLO instance, the LB uses a tracking 
 | user                | yes      | value: admin username                                                                                 |
 | password            | yes      | value: admin password                                                                                 |
 | service             | yes      | value: none - service start block                                                                     |
-|   type              | yes      | value: mapping                                                                                        |
+| &nbsp;&nbsp;type    | yes      | value: mapping                                                                                        |
 |   mapping           | yes      | value: none - mapping start block                                                                     |
 |                     |          |                                                                                                       |
 |     - service       | yes      | value: service name                                                                                   |
