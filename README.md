@@ -52,6 +52,7 @@ The
 | service   | yes      | value: none - service start block                                                                     |
 | type      | yes      | value: mapping                                                                                        |
 | mapping   | yes      | value: none - mapping start block                                                                     |
+|           |          |                                                                                                       |
 | - service | yes      | value: service name                                                                                   |
 | maps      | yes      | value: none - service map start block                                                                 |
 | - name    | yes      | value: arbitrary name of the SSLO appliance instance                                                  |
