@@ -24,7 +24,7 @@ In this repository, that complex per-service-type wiring will be thoroughly expl
 The toolset consists of a central Python application and a set of YAML-based configuration files. The YAML files constitute a single source-of-truth for each security device deployed, and defines both sides - how SSL Orchestrator speaks to the service, and how the L4 speaks to the respective devices. Otherwise, the toolset abstracts away as much of the complexity as possible. The individual security service definitions are independent and atomic, allowing for fast creation, modification, and deletion of configurations. In the remaining portion of this README, details of the toolset and YAML file syntax will be described.
 
 
-### How to install
+### How to install and use
 The Python application can either run on your local system (targeting remote BIG-IPs), or directly on the L4 BIG-IP (targeting localhost). Copy the Python application to the desired path and provide it a configuration YAML file.
 
 `python sslo-tier-tool.py --file layer3service1.yml`
