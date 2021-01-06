@@ -43,6 +43,49 @@ The following is the detailed YAML configuration syntax for service mapping and 
 ### Service mapping
 The 
 
+| field     | required | Description                                                                                           |
+|-----------|----------|-------------------------------------------------------------------------------------------------------|
+| name      | yes      | value: arbitrary string - provide a name for this document                                            |
+| host      | yes      | value: Host, IP, localhost                                                                            |
+| user      | yes      | value: admin username                                                                                 |
+| password  | yes      | value: admin password                                                                                 |
+| service   | yes      | value: none - service start block                                                                     |
+| type      | yes      | value: mapping                                                                                        |
+| mapping   | yes      | value: none - mapping start block                                                                     |
+| - service | yes      | value: service name                                                                                   |
+| maps      | yes      | value: none - service map start block                                                                 |
+| - name    | yes      | value: arbitrary name of the SSLO appliance instance                                                  |
+| srcmac    | yes      | value: MAC address from which traffic will arrive from this SSLO appliance to the LB service instance |
+| dstip     | yes      | value: destination IP to send traffic back to this SSLO appliance                                     |
+
+Example:
+```
+name: service mapping
+host: localhost
+user: admin
+password: admin
+service:
+  type: mapping
+  mapping:
+    
+    - service: layer3b
+      maps:
+        - name: sslo1
+          srcmac: "52:54:00:11:a4:42"
+          destip: "198.19.2.245"
+        - name: sslo2
+          srcmac: "52:54:00:db:cb:98"
+          destip: "198.19.2.244"
+    
+    - service: layer2b
+      maps:
+        - name: sslo1
+          srcmac: "52:54:00:11:a4:42"
+          destip: "198.9.64.245"
+        - name: sslo2
+          srcmac: "52:54:00:db:cb:98"
+          destip: "198.9.64.244"
+```
 
 ### Layer 3 security service YAML definition
 The 
