@@ -40,6 +40,7 @@ The following is the detailed YAML configuration syntax for service mapping and 
 - ICAP security service
 - Monitoring
 
+|
 
 ### Service mapping
 To understand mapping, it is first critical to understand how traffic flows through this architecture. Encrypted traffic from a load balancer (could be the same L4 LB) is distributed to SSL Orchestrator instances. Each SSLO instance is configured roughly the same, only that the service definitions use slightly offset entry and return self-IPs (in the same subnets). As decrypted traffic passes to a service in the service chain, SSLO passes this to a corresponding listener on the L4 LB. This F5 then appropriately load balances the traffic to the set of security devices. These devices will pass the traffic back to the L4 LB, and the L4 LB must then pass the traffic back to the correct SSLO instance. The L4 LB cannot take advantage of split-session signaling as SSL Orchestrator does, so must use a different method to ensure proper return routing to an SSL Orchestrator instance.
@@ -98,6 +99,7 @@ service:
           destip: "198.9.64.244"
 ```
 
+|
 
 ### Layer 3 security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
@@ -213,6 +215,7 @@ service:
     - 198.19.64.65
 ```
 
+|
 
 ### Layer 2 security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
@@ -314,6 +317,8 @@ service:
       entry-interface: 1.6
       return-interface: 1.7
 ```
+
+|
 
 ### HTTP transparent security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
@@ -429,6 +434,7 @@ service:
     - 198.19.97.30
 ```
 
+|
 
 ### HTTP explicit security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
@@ -545,6 +551,7 @@ service:
     - 198.19.96.66:3128
 ```
 
+|
 
 ### ICAP security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
@@ -645,6 +652,8 @@ service:
     - 10.1.30.50
     - 10.1.30.51
 ```
+
+|
 
 ### Monitoring
 
