@@ -33,6 +33,8 @@ The tool will validate the YAML configuration and then push the required setting
 
 The YAML configuration files represent the network relationships between SSLO and the L4 LB (SSLO-side), and L4 LB and security devices (SVC-side), and contain the absolute minimum requirements to establish connectivity. The tool takes this information and derives the remaining requirements and builds all of the necessary network objects.
 
+Example:
+
 ![YAML configuration](images/images4.png)
 
 On the SSL Orchestrator side, the SSLO-side YAML settings represent what the SSLO service definitions will point to - the SSLO service defines one security device, which is the corresponding listening instance on the L4 LB.
