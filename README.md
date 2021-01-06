@@ -38,6 +38,7 @@ The following is the detailed YAML configuration syntax for service mapping and 
 - HTTP explicit security service
 - HTTP transparent security service
 - ICAP security service
+- Monitoring
 
 
 ### Service mapping
@@ -120,21 +121,21 @@ The SSLO-side configuration is what the SSLO instances will define in their resp
 |                            |          |                                                                                                       |
 |     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
 |       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
-|       entry-self           | yes      | value: the self-IP for this interface                                                                 |
-|       entry-float          | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
 |       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
-|       return-self          | yes      | value: the self-IP for this interface                                                                 |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
 |       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |                            |          |                                                                                                       |
 |     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
 |       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
-|       entry-self           | yes      | value: the self-IP for this interface                                                                 |
-|       entry-float          | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
 |       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
-|       return-self          | yes      | value: the self-IP for this interface                                                                 |
-|       return-float         | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       return-float         | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
 |       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |                            |          |                                                                                                       |
 |     svc-members            | yes      | value: none - security device IP list start block                                                     |
@@ -176,7 +177,7 @@ service:
 
 **HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
 
-*Also note that the SSLO-side return interface does not require a floating self-IP*
+*Also note that the SSLO-side return interface does not require a floating self-IP in HA mode*
 
 ```
 name: layer3a service
@@ -237,11 +238,11 @@ The SSLO-side configuration is what the SSLO instances will define in their resp
 |                            |          |                                                                                                       |
 |     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
 |       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
-|       entry-self           | yes      | value: the self-IP for this interface                                                                 |
-|       entry-float          | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
 |       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
-|       return-self          | yes      | value: the self-IP for this interface                                                                 |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
 |       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |                            |          |                                                                                                       |
 |     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
@@ -284,7 +285,7 @@ service:
 
 **HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
 
-*Also note that the SSLO-side return interface does not require a floating self-IP*
+*Also note that the SSLO-side return interface does not require a floating self-IP in HA mode*
 
 ```
 name: layer2b service
@@ -315,13 +316,335 @@ service:
 ```
 
 ### HTTP transparent security service YAML definition
-The 
+Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
+
+The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the http transparent proxy node in the SSLO config is the SSLO-side "entry-self" address on the L4 LB.
+
+*Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.*
+
+**Details**:
+| field                      | required | Description                                                                                           |
+|----------------------------|----------|-------------------------------------------------------------------------------------------------------|
+| name                       | yes      | value: arbitrary string - provide a name for this document                                            |
+| desc                       | no       | value: arbitrary string                                                                               |
+| host                       | yes      | value: Host, IP, localhost                                                                            |
+| user                       | yes      | value: admin username                                                                                 |
+| password                   | yes      | value: admin password                                                                                 |
+| service                    | yes      | value: none - service start block                                                                     |
+|   type                     | yes      | value: http_transparent                                                                               |
+|   name                     | yes      | value: the name of this service instance                                                              |
+|   state                    | yes      | value: 'present' or 'absent' - allows you define create/update state, or deletion                     |
+|                            |          |                                                                                                       |
+|     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       return-float         | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-members            | yes      | value: none - security device IP list start block                                                     |
+|       - [ip]               | yes      | value: IP of http transparent security device.                                                        |
+|       - [ip]               | yes      | value: IP of http transparent security device.                                                        |
+
+**Standalone example**:
+
+```
+name: http transparent service
+desc: http transparent service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: http_transparent
+  name: proxy2
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.11.96.50/25
+    entry-tag: 510
+    return-interface: 1.2
+    return-self: 198.11.96.140/25
+    return-tag: 511
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.97.7/25
+    entry-tag: 31
+    return-interface: 1.3
+    return-self: 198.19.97.245/25
+    return-tag: 41
+  
+  svc-members:
+    - 198.19.97.30
+```
+
+**HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+
+*Also note that the SSLO-side return interface does not require a floating self-IP in HA mode*
+
+```
+name: http transparent service
+desc: http transparent service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: http_transparent
+  name: proxy2
+  state: absent
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.11.96.40/25
+    entry-float: 198.11.96.50/25 
+    entry-tag: 510
+    return-interface: 1.2
+    return-self: 198.11.96.140/25
+    return-tag: 511
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.97.6/25
+    entry-float: 198.19.97.7/25
+    entry-tag: 31
+    return-interface: 1.3
+    return-self: 198.19.97.240/25
+    return-float: 198.19.97.245/25
+    return-tag: 41
+  
+  svc-members:
+    - 198.19.97.30
+```
 
 
 ### HTTP explicit security service YAML definition
-The 
+Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
+
+The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the http explicit proxy node in the SSLO config is the SSLO-side "entry-ip" address on the L4 LB.
+
+*Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.*
+
+**Details**:
+| field                      | required | Description                                                                                           |
+|----------------------------|----------|-------------------------------------------------------------------------------------------------------|
+| name                       | yes      | value: arbitrary string - provide a name for this document                                            |
+| desc                       | no       | value: arbitrary string                                                                               |
+| host                       | yes      | value: Host, IP, localhost                                                                            |
+| user                       | yes      | value: admin username                                                                                 |
+| password                   | yes      | value: admin password                                                                                 |
+| service                    | yes      | value: none - service start block                                                                     |
+|   type                     | yes      | value: http_explicit                                                                                  |
+|   name                     | yes      | value: the name of this service instance                                                              |
+|   state                    | yes      | value: 'present' or 'absent' - allows you define create/update state, or deletion                     |
+|                            |          |                                                                                                       |
+|     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-ip             | yes      | value: the listening IP for this explicit proxy service                                               |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       return-float         | yes (HA) | value: the floating self-IP and subnet mask for this interface in an HA config                        |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-members            | yes      | value: none - security device IP list start block                                                     |
+|       - [ip]               | yes      | value: listening IP and port of http explicit security device.                                        |
+|       - [ip]               | yes      | value: listening IP and port of http explicit security device.                                        |
+
+**Standalone example**:
+
+```
+name: http explicit service
+desc: http explicit service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: http_explicit
+  name: proxy1
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.12.96.38/25
+    entry-ip: 198.12.96.40
+    entry-tag: 500
+    return-interface: 1.2
+    return-self: 198.12.96.140/25
+    return-tag: 501
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.96.7/25
+    entry-tag: 30
+    return-interface: 1.3
+    return-self: 198.19.96.245/25
+    return-tag: 40
+  
+  svc-members:
+    - 198.19.96.66:3128
+```
+
+**HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+
+*Also note that the SSLO-side interfaces do not require floating self-IP in HA mode*
+
+```
+name: http explicit service
+desc: http explicit service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: http_explicit
+  name: proxy1
+  state: absent
+  
+  sslo-side-net:
+    entry-interface: 1.3
+    entry-self: 198.12.96.39/25
+    entry-ip: 198.12.96.40
+    entry-tag: 500
+    return-interface: 1.3
+    return-self: 198.12.96.141/25
+    return-tag: 501
+  
+  svc-side-net:
+    entry-interface: 1.6
+    entry-self: 198.19.96.8/25
+    entry-float: 198.19.96.7/25
+    entry-tag: 30
+    return-interface: 1.6
+    return-self: 198.19.96.241/25
+    return-float: 198.19.96.245/25
+    return-tag: 40
+  
+  svc-members:
+    - 198.19.96.66:3128
+```
 
 
 ### ICAP security service YAML definition
-The 
+Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
+
+The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the ICAP node in the SSLO config is the SSLO-side "entry-ip" address on the L4 LB.
+
+*Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.*
+
+**Details**:
+| field                      | required | Description                                                                                           |
+|----------------------------|----------|-------------------------------------------------------------------------------------------------------|
+| name                       | yes      | value: arbitrary string - provide a name for this document                                            |
+| desc                       | no       | value: arbitrary string                                                                               |
+| host                       | yes      | value: Host, IP, localhost                                                                            |
+| user                       | yes      | value: admin username                                                                                 |
+| password                   | yes      | value: admin password                                                                                 |
+| service                    | yes      | value: none - service start block                                                                     |
+|   type                     | yes      | value: icap                                                                                           |
+|   name                     | yes      | value: the name of this service instance                                                              |
+|   state                    | yes      | value: 'present' or 'absent' - allows you define create/update state, or deletion                     |
+|                            |          |                                                                                                       |
+|     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-ip             | yes      | value: the listening IP for this explicit proxy service                                               |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP and subnet mask for this interface                                                 |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       entry-snat           | no       | value: if present, can either be 'automap', or the start block for a list of SNAT pool IPs.           |
+|                            |          |                                                                                                       |
+|     svc-members            | yes      | value: none - security device IP list start block                                                     |
+|       - [ip]               | yes      | value: listening IP and port of http explicit security device.                                        |
+|       - [ip]               | yes      | value: listening IP and port of http explicit security device.                                        |
+
+**Standalone example**:
+
+```
+name: icap service
+desc: icap service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: icap
+  name: icap1
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.10.96.38/25
+    entry-ip: 198.10.96.40
+    entry-tag: 520
+  
+  svc-side-net:
+    entry-interface: 1.2
+    entry-self: 10.1.30.125/24
+    entry-snat:
+      - 10.1.30.10
+      - 10.1.30.11
+      - 10.1.30.12
+      - 10.1.30.13
+  
+  svc-members:
+    - 10.1.30.50
+    - 10.1.30.51
+```
+
+**HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+
+*Also note that the SSLO-side interfaces do not require floating self-IP in HA mode*
+
+```
+name: icap service
+desc: icap service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: icap
+  name: icap1
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.10.96.38/25
+    entry-ip: 198.10.96.40
+    entry-tag: 520
+  
+  svc-side-net:
+    entry-interface: 1.2
+    entry-self: 10.1.30.125/24
+    entry-snat: automap
+  
+  svc-members:
+    - 10.1.30.50
+    - 10.1.30.51
+```
+
+### Monitoring
 
