@@ -54,21 +54,21 @@ For each security service, the L4 LB effectively straddles two networks:
 In order to return traffic to the correct SSLO instance, the LB uses a tracking mechanism based on the incoming MAC address (the SSLO entry MAC). This MAC address (A) is statically mapped to the destination IP on the SSLO return side (B). As traffic enters the L4 LB on the SSLO-side, the SSLO MAC address is captured. When it is time to return traffic to SSLO, the MAC address is mapped to the correct destination (route) IP and forwarded. Thus a mapping table is required for each security service, for each SSLO instance. The following table and example illustrate the syntax of this mapping table. Note that any time a service is created on the L4 LB, the mapping table must be updated accordingly.
 
 **Details**:
-| field                                            | req | Description                                                                                      |
-|--------------------------------------------------|-----|-------------------------------------------------------------------------------------------------------|
-| name                                             | yes | value: arbitrary string - provide a name for this document                                            |
-| host                                             | yes | value: Host, IP, localhost                                                                            |
-| user                                             | yes | value: admin username                                                                                 |
-| password                                         | yes | value: admin password                                                                                 |
-| service                                          | yes | value: none - service start block                                                                     |
-| &nbsp;&nbsp;type                                 | yes | value: mapping                                                                                        |
-| &nbsp;&nbsp;mapping                              | yes | value: none - mapping start block                                                                     |
-|                                                  |     |                                                                                                       |
-| &nbsp;&nbsp;&nbsp;&nbsp;- service                | yes | value: service name                                                                                   |
-| &nbsp;&nbsp;&nbsp;&nbsp;maps                     | yes | value: none - service map start block                                                                 |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name       | yes | value: arbitrary name of the SSLO appliance instance                                                  |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;srcmac | yes | value: MAC address from which traffic will arrive from this SSLO appliance to the LB service instance |
-| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dstip  | yes | value: destination IP to send traffic back to this SSLO appliance                                     |
+| field                                                  | req | Description                                                                                      |
+|--------------------------------------------------------|-----|--------------------------------------------------------------------------------------------------|
+| name                                                   | yes | value: arbitrary string - provide a name for this document                                       |
+| host                                                   | yes | value: Host, IP, localhost                                                                       |
+| user                                                   | yes | value: admin username                                                                            |
+| password                                               | yes | value: admin password                                                                            |
+| service                                                | yes | value: none - service start block                                                                |
+| &nbsp;&nbsp;type                                       | yes | value: mapping                                                                                   |
+| &nbsp;&nbsp;mapping                                    | yes | value: none - mapping start block                                                                |
+|                                                        |     |                                                                                                  |
+| &nbsp;&nbsp;&nbsp;&nbsp;- service                      | yes | value: service name                                                                              |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;map                | yes | value: none - service map start block                                                            |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- name             | yes | value: arbitrary name of the SSLO appliance instance                                             |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;srcmac | yes | value: MAC address from incoming SSLO appliance to the LB service instance                       |
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dstip  | yes | value: destination IP to send traffic back to this SSLO appliance                                |
 
 **Example**:
 ```
