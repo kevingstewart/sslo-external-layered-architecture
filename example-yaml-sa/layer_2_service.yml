@@ -1,0 +1,24 @@
+name: layer2b service
+host: localhost
+user: admin
+password: admin
+service:
+  type: layer2
+  name: layer2b
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.9.64.50/25 
+    entry-tag: 400
+    return-interface: 1.2
+    return-self: 198.9.64.140/25
+    return-tag: 401
+  
+  svc-side-net:
+    - name: FEYE1
+      entry-interface: 1.4
+      return-interface: 1.5
+    - name: FEYE1
+      entry-interface: 1.6
+      return-interface: 1.7
