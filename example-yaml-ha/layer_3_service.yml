@@ -1,0 +1,31 @@
+name: layer3a service
+desc: Layer 3 service (b)
+host: localhost
+user: admin
+password: admin
+service:
+  type: layer3
+  name: layer3b
+  state: absent
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.19.2.40/25
+    entry-float: 198.19.2.50/25 
+    entry-tag: 100
+    return-interface: 1.2
+    return-self: 198.19.2.140/25
+    return-tag: 101
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.64.6/25
+    entry-float: 198.19.64.7/25
+    entry-tag: 10
+    return-interface: 1.3
+    return-self: 198.19.64.240/25
+    return-float: 198.19.64.245/25
+    return-tag: 20
+  
+  svc-members:
+    - 198.19.64.65
