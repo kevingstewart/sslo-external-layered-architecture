@@ -51,7 +51,7 @@ For each security service, the L4 LB effectively straddles two networks:
 
 In order to return traffic to the correct SSLO instance, the LB uses a tracking mechanism based on the incoming MAC address (the SSLO entry MAC). This MAC address (A) is statically mapped to the destination IP on the SSLO return side (B). As traffic enters the L4 LB on the SSLO-side, the SSLO MAC address is captured. When it is time to return traffic to SSLO, the MAC address is mapped to the correct destination (route) IP and forwarded. Thus a mapping table is required for each security service, for each SSLO instance. The following table and example illustrate the syntax of this mapping table. Note that any time a service is created on the L4 LB, the mapping table must be updated accordingly.
 
-
+**Details**:
 | field               | required | Description                                                                                           |
 |---------------------|----------|-------------------------------------------------------------------------------------------------------|
 | name                | yes      | value: arbitrary string - provide a name for this document                                            |
@@ -68,7 +68,7 @@ In order to return traffic to the correct SSLO instance, the LB uses a tracking 
 |           srcmac    | yes      | value: MAC address from which traffic will arrive from this SSLO appliance to the LB service instance |
 |           dstip     | yes      | value: destination IP to send traffic back to this SSLO appliance                                     |
 
-Example:
+**Example**:
 ```
 name: service mapping
 host: localhost
@@ -99,7 +99,114 @@ service:
 
 
 ### Layer 3 security service YAML definition
-The 
+Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
+
+Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.
+
+**Details**:
+| field                      | required | Description                                                                                           |
+|----------------------------|----------|-------------------------------------------------------------------------------------------------------|
+| name                       | yes      | value: arbitrary string - provide a name for this document                                            |
+| desc                       | no       | value: arbitrary string                                                                               |
+| host                       | yes      | value: Host, IP, localhost                                                                            |
+| user                       | yes      | value: admin username                                                                                 |
+| password                   | yes      | value: admin password                                                                                 |
+| service                    | yes      | value: none - service start block                                                                     |
+|   type                     | yes      | value: layer3                                                                                         |
+|   name                     | yes      | value: the name of this service instance                                                              |
+|   state                    | yes      | value: 'present' or 'absent' - allows you define create/update state, or deletion                     |
+|                            |          |                                                                                                       |
+|     sslo-side-net          | yes      | value: none - sslo-side configuration start block                                                     |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP for this interface                                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP for this interface                                                                 |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-side-net           | yes      | value: none - svc-side configuration start block                                                      |
+|       entry-interface      | yes      | value: the physical interfaces for incoming traffic from SSLO instances                               |
+|       entry-self           | yes      | value: the self-IP for this interface                                                                 |
+|       entry-float          | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       entry-tag            | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|       return-interface     | yes      | value: the physical interfaces for outgoing traffic to SSLO instances.                                |
+|       return-self          | yes      | value: the self-IP for this interface                                                                 |
+|       return-float         | yes (HA) | value: the floating self-IP for this interface in an HA config                                        |
+|       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
+|                            |          |                                                                                                       |
+|     svc-members            | yes      | value: none - security device IP list start block                                                     |
+|       - <ip>               | yes      | value: IP of layer 3 security device.                                                                 |
+|       - <ip>               | yes      | value: IP of layer 3 security device.                                                                 |
+
+**Standalone example**:
+
+```
+name: layer3a service
+desc: Layer 3 service (b)
+host: localhost
+user: admin
+password: admin
+service:
+  type: layer3
+  name: layer3b
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.19.2.50/25
+    entry-tag: 100
+    return-interface: 1.2
+    return-self: 198.19.2.140/25
+    return-tag: 101
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.64.7/25
+    entry-tag: 10
+    return-interface: 1.3
+    return-self: 198.19.64.245/25
+    return-tag: 20
+  
+  svc-members:
+    - 198.19.64.65
+```
+
+**HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+
+```
+name: layer3a service
+desc: Layer 3 service (b)
+host: localhost
+user: admin
+password: admin
+service:
+  type: layer3
+  name: layer3b
+  state: absent
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.19.2.40/25
+    entry-float: 198.19.2.50/25 
+    entry-tag: 100
+    return-interface: 1.2
+    return-self: 198.19.2.140/25
+    return-tag: 101
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.64.6/25
+    entry-float: 198.19.64.7/25
+    entry-tag: 10
+    return-interface: 1.3
+    return-self: 198.19.64.240/25
+    return-float: 198.19.64.245/25
+    return-tag: 20
+  
+  svc-members:
+    - 198.19.64.65
+```
 
 
 ### Layer 2 security service YAML definition
