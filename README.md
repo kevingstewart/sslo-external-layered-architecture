@@ -173,6 +173,7 @@ service:
 ```
 
 **HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+*Also note that the SSLO-side return interface does not require a floating self-IP*
 
 ```
 name: layer3a service
