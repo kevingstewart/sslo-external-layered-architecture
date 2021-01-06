@@ -656,4 +656,14 @@ service:
 <br />
 
 ### <a name="monitoring"></a>Monitoring
+For each security service, the tool will create a separate virtual server listening on the SSLO-side entry-self or entry-float and port 9999. This virtual server includes an iRule that simply responds to monitor queries on the respective security device pool. To effectively monitor the security services from the SSL Orchestrator, create a new TCP half-open monitor on the SSL Orchestrator as such:
+
+```
+Type: TCP Half Open
+Interval: 2 seconds
+Timeout: 4 seconds
+Alias Service Port: 9999
+```
+
+Apply this same monitor as a custom monitor in each SSL Orchestrator security service definition. The monitor queries the single (L4 LB) pool member on port 9999. The corresponding listener on the L4 LB checks the status of the pool and either completes the TCP half open, or drops causing the service monitor to fail.
 
