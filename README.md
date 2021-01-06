@@ -32,17 +32,17 @@ The Python application can either run on your local system (targeting remote BIG
 The tool will validate the YAML configuration and then push the required settings to the L4 BIG-IP. This tool supports standalone and HA L4 configurations, generally by including separate IPs, interfaces, tags, and floating IPs for each appliance. Also note that updates are disruptive. To facilitate quick and complete updates to network objects, any existing objects for this service are first removed and then rebuilt. This will cause a momentary lapse in traffic flow to this service. It is therefore recommended that the service be taken out of active SSL Orchestrator service chains before performing any management actions.
 
 The following is the detailed YAML configuration syntax for service mapping and each supported security device type:
-- Service mapping
-- Layer 3 security service
-- Layer 2 security service
-- HTTP explicit security service
-- HTTP transparent security service
-- ICAP security service
-- Monitoring
+- [link](#service-mapping)Service mapping
+- [link](#service-layer-3)Layer 3 security service
+- [link](#service-layer-2)Layer 2 security service
+- [link](#service-http-transparent)HTTP explicit security service
+- [link](#service-http-explicit)HTTP transparent security service
+- [link](#service-icap)ICAP security service
+- [link](#monitoring)Monitoring
 
 |
 
-### Service mapping
+### <a name="service-mapping"></a>Service mapping
 To understand mapping, it is first critical to understand how traffic flows through this architecture. Encrypted traffic from a load balancer (could be the same L4 LB) is distributed to SSL Orchestrator instances. Each SSLO instance is configured roughly the same, only that the service definitions use slightly offset entry and return self-IPs (in the same subnets). As decrypted traffic passes to a service in the service chain, SSLO passes this to a corresponding listener on the L4 LB. This F5 then appropriately load balances the traffic to the set of security devices. These devices will pass the traffic back to the L4 LB, and the L4 LB must then pass the traffic back to the correct SSLO instance. The L4 LB cannot take advantage of split-session signaling as SSL Orchestrator does, so must use a different method to ensure proper return routing to an SSL Orchestrator instance.
 
 ![SSL Orchestrator data flow](images/images3a.png)
@@ -101,7 +101,7 @@ service:
 
 |
 
-### Layer 3 security service YAML definition
+### <a name="service-layer-3"></a>Layer 3 security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
 The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the layer 3 node in the SSLO config is the SSLO-side "entry-self" address on the L4 LB.
@@ -217,7 +217,7 @@ service:
 
 |
 
-### Layer 2 security service YAML definition
+### <a name="service-layer-2"></a>Layer 2 security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
 To support layer 2 security devices, they must be defined as inline layer 3 services in SSL Orchestrator. The SSLO instances use normal layer 3 routing to the L4 LB listener, and the L4 handles the layer 2 communications on its respective SVC-side.
@@ -320,7 +320,7 @@ service:
 
 |
 
-### HTTP transparent security service YAML definition
+### <a name="service-http-transparent"></a>HTTP transparent security service YAML definition</a>
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
 The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the http transparent proxy node in the SSLO config is the SSLO-side "entry-self" address on the L4 LB.
@@ -436,7 +436,7 @@ service:
 
 |
 
-### HTTP explicit security service YAML definition
+### <a name="service-http-explicit"></a>HTTP explicit security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
 The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the http explicit proxy node in the SSLO config is the SSLO-side "entry-ip" address on the L4 LB.
@@ -553,7 +553,7 @@ service:
 
 |
 
-### ICAP security service YAML definition
+### <a name="service-icap"></a> ICAP security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
 The SSLO-side configuration is what the SSLO instances will define in their respective service settings. Each security service in the SSLO instances will have ONE device defined - the L4 LB listener. In this case, the ICAP node in the SSLO config is the SSLO-side "entry-ip" address on the L4 LB.
@@ -655,5 +655,5 @@ service:
 
 |
 
-### Monitoring
+### <a name="monitoring"></a>Monitoring
 
