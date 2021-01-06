@@ -49,6 +49,7 @@ The following is the detailed YAML configuration syntax for service mapping and 
 - [HTTP explicit security service](#service-http-explicit)
 - [ICAP security service](#service-icap)
 - [Monitoring](#monitoring)
+- [IP addressing](#ip-addressing)
 
 <br />
 
@@ -676,4 +677,16 @@ Alias Service Port: 9999
 ```
 
 Apply this same monitor as a custom monitor in each SSL Orchestrator security service definition. The monitor queries the single (L4 LB) pool member on port 9999. The corresponding listener on the L4 LB checks the status of the pool and either completes the TCP half open, or drops causing the service monitor to fail.
+
+<br />
+
+### <a name="ip-addressing"></a>IP addressing
+Throughout this document you have seen reference to RFC2544 IPs (ex. 198.19.x.y) and /25 subnets. Keep in mind that the networking between the SSL Orchestrator appliances and L4 LB should be isolated (as it carries decrypted traffic), so these non-routable RFC2544 subnets are useful here. For reference, a /25 subnet breaks the fourth octet in half - 0:127 and 128:255. This is an excellent way to maximize IP ranges inside of this solution, and in some cases could also be reduced to /26, /27 or lower depending on your needs. Please take note of the following additional considerations for IP addressing in this solution:
+
+- Each security service must inhabit its own unique IP subnets.
+- Each SSL Orchestrator appliance must offset its entry and return self-IPs for each security service so that it is unique. For example, if a layer 3 service to-service subnet is 198.19.32.0/25, SSLO1 might use 198.19.32.7 as its to-service self-IP, SSLO2 might use 198.19.32.8, etc. The same applies to to-service and from-service self-IPs.
+- As stated above, the network between SSLO and the L4 LB should be isolated (as should the L4 LB to security devices networks). In this case, the RFC2544 addressing is appropriate here. And as all of these are effectively layer 3 connections between F5 BIG-IPs, it is also useful to simply use a single physical interface between each SSLO and the L4 LB and define unique 802.1Q VLAN tags for each SSLO-side service connection. This will drastically reduce the number of physical ports required.
+- A notable exception to the above, for SVC-side configurations, is layer 2 devices. The YAML configuration only requires the name and entry and return interfaces for each device. The tool uses an algorithm to internally select and implement unique self-IP subnets (in the 198.18.0.0/16 range) and unique route domains.
+
+
 
