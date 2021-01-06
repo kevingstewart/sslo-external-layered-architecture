@@ -136,8 +136,8 @@ Note in the above image, it is most appropriate to use a single VLAN tagged inte
 |       return-tag           | no       | value: if present, represents the 802.1Q VLAN tag for this interface.                                 |
 |                            |          |                                                                                                       |
 |     svc-members            | yes      | value: none - security device IP list start block                                                     |
-|       - <ip>               | yes      | value: IP of layer 3 security device.                                                                 |
-|       - <ip>               | yes      | value: IP of layer 3 security device.                                                                 |
+|       - [ip]               | yes      | value: IP of layer 3 security device.                                                                 |
+|       - [ip]               | yes      | value: IP of layer 3 security device.                                                                 |
 
 **Standalone example**:
 
