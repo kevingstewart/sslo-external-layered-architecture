@@ -1,0 +1,28 @@
+name: http transparent service
+desc: http transparent service (a)
+host: localhost
+user: admin
+password: admin
+service:
+  type: http_transparent
+  name: proxy2
+  state: present
+  
+  sslo-side-net:
+    entry-interface: 1.2
+    entry-self: 198.11.96.50/25
+    entry-tag: 510
+    return-interface: 1.2
+    return-self: 198.11.96.140/25
+    return-tag: 511
+  
+  svc-side-net:
+    entry-interface: 1.3
+    entry-self: 198.19.97.7/25
+    entry-tag: 31
+    return-interface: 1.3
+    return-self: 198.19.97.245/25
+    return-tag: 41
+  
+  svc-members:
+    - 198.19.97.30
