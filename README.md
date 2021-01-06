@@ -31,6 +31,14 @@ The Python application can either run on your local system (targeting remote BIG
 
 The tool will validate the YAML configuration and then push the required settings to the L4 BIG-IP. This tool supports standalone and HA L4 configurations, generally by including separate IPs, interfaces, tags, and floating IPs for each appliance. Also note that updates are disruptive. To facilitate quick and complete updates to network objects, any existing objects for this service are first removed and then rebuilt. This will cause a momentary lapse in traffic flow to this service. It is therefore recommended that the service be taken out of active SSL Orchestrator service chains before performing any management actions.
 
+The YAML configuration files represent the network relationships between SSLO and the L4 LB (SSLO-side), and L4 LB and security devices (SVC-side), and contain the absolute minimum requirements to establish connectivity. The tool takes this information and derives the remaining requirements and builds all of the necessary network objects.
+
+![YAML configuration](images/images4.png)
+
+On the SSL Orchestrator side, the SSLO-side YAML settings represent what the SSLO service definitions will point to - the SSLO service defines one security device, which is the corresponding listening instance on the L4 LB.
+
+<br />
+
 The following is the detailed YAML configuration syntax for service mapping and each supported security device type:
 - [Service mapping](#service-mapping)
 - [Layer 3 security service](#service-layer-3)
