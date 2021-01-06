@@ -57,7 +57,7 @@ In order to return traffic to the correct SSLO instance, the LB uses a tracking 
 | field                                                  | req | Description                                                                                      |
 |--------------------------------------------------------|-----|--------------------------------------------------------------------------------------------------|
 | name                                                   | yes | value: arbitrary string - provide a name for this document                                       |
-| host                                                   | yes | value: Host, IP, localhost                                                                       |
+| : host                                                 | yes | value: Host, IP, localhost                                                                       |
 | user                                                   | yes | value: admin username                                                                            |
 | password                                               | yes | value: admin password                                                                            |
 | service                                                | yes | value: none - service start block                                                                |
