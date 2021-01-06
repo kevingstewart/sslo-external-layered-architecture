@@ -101,7 +101,7 @@ service:
 ### Layer 3 security service YAML definition
 Each "inline" service instance type will minimally define SSLO-side settings (how SSLO communicates with this listener), and SVC-side settings (how this F5 communicates with the security devices). This supports both single and HA-type deployments.
 
-Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.
+*Note in the above image, it is most appropriate to use a single VLAN tagged interface on the SSLO side to save on physical ports.*
 
 **Details**:
 | field                      | required | Description                                                                                           |
@@ -173,6 +173,7 @@ service:
 ```
 
 **HA example**: (a separate configuration YAML file is needed for each L4 LB peer)
+
 *Also note that the SSLO-side return interface does not require a floating self-IP*
 
 ```
