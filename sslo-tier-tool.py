@@ -2,7 +2,7 @@
 
 #### SSL Orchestrator External Tiered Architecture Helper Utility #########
 #### Author: Kevin Stewart, Sr. SSA, F5 Networks
-#### Date: 12/2020
+#### Date: 1/2021
 #### Version: 1.1
 #### Purpose: This tool automates the creation of service objects on a BIG-IP LTM to act as a "proxy" for SSLO security services in an 
 ####    external tiered architecture (physical LTM in front of load balanced standalone SSLO instances). The tool creates appropriate 
@@ -15,11 +15,6 @@
 ####    ex. python sslo-tier-tool.py --file icapservice1.yml
 ####
 ####    Please refer to () for detailed information on the use of this tool and service configuration YAML syntax.
-
-
-#### TO-DO ####
-# Monitoring
-# Test with UDP traffic
 
 
 ## Imports
