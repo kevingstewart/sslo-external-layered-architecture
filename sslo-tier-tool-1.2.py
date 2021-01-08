@@ -431,8 +431,8 @@ def service_layer3(configs):
 
         ## commit transaction
         del s.headers['X-F5-REST-Coordination-Id']
-        #result = s.patch("https://" + host + "/mgmt/tm/transaction/{}".format(tx), data=json.dumps({"state":"VALIDATING"})).json()['state']
-        result = s.patch("https://" + host + "/mgmt/tm/transaction/{}".format(tx), data=json.dumps({"state":"VALIDATING"})).json()
+        result = s.patch("https://" + host + "/mgmt/tm/transaction/{}".format(tx), data=json.dumps({"state":"VALIDATING"})).json()['state']
+        #result = s.patch("https://" + host + "/mgmt/tm/transaction/{}".format(tx), data=json.dumps({"state":"VALIDATING"})).json()
         print(result)
 
     else:
