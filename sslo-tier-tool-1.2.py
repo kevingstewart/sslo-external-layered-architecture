@@ -1256,6 +1256,9 @@ def service_mapping(configs):
         password = configs["password"]
     else:
         error_exit("No password supplied in YAML")
+        
+    ## make sure the data group exists
+    sslo_datagroup(user, password, host)
 
     ## sslo-side-net and svc-side-net base keys
     if "mapping" not in configs["service"].keys():
